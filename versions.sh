@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-
+set -x
 alpine="$(
 	bashbrew cat --format '{{ .TagEntry.Tags | join "\n" }}' https://github.com/docker-library/official-images/raw/HEAD/library/alpine:latest \
 		| grep -E '^[0-9]+[.][0-9]+$'
@@ -93,7 +93,7 @@ fi
 versions=( "${versions[@]%/}" )
 
 packages="$(
-	wget -qO- 'https://github.com/roshkhatri/valkey-hashes/raw/master/README' \
+	wget -qO- 'https://github.com/roshkhatri/valkey-hashes/raw/main/README' \
 		| jq -csR '
 			rtrimstr("\n")
 			| split("\n")
@@ -103,7 +103,7 @@ packages="$(
 					[
 						"^hash[[:space:]]+",
 						"(?<file>valkey-",
-						"(?<version>([0-9.]+)(-rc[0-9]+)?|unstable",
+						"(?<version>([0-9.]+)(-rc[0-9]+)?)",
 						"[.][^[:space:]]+)[[:space:]]+",
 						"(?<type>sha256|sha1)[[:space:]]+", # this filters us down to just the checksum types we are prepared to handle right now
 						"(?<sum>[0-9a-f]{64}|[0-9a-f]{40})[[:space:]]+",
@@ -121,6 +121,9 @@ packages="$(
 )"
 
 for version in "${versions[@]}"; do
+	if [[ "$version" == "unstable" ]]; then
+        continue
+    fi
 	export version rcVersion="${version%-rc}"
 
 	doc="$(

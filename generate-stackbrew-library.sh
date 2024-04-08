@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-
+set -x
 declare -A aliases=(
 	[0.9]='0 latest'
 )
@@ -10,6 +10,8 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 if [ "$#" -eq 0 ]; then
 	versions="$(jq -r 'keys | map(@sh) | join(" ")' versions.json)"
+	unstable="$(jq -r 'keys | map(@sh) | join(" ")' unstable.json)"
+	versions="$versions $unstable"
 	eval "set -- $versions"
 fi
 
@@ -55,11 +57,10 @@ getArches() {
 getArches 'valkey'
 
 cat <<-EOH
-# this file is generated via https://github.com/docker-library/redis/blob/$(fileCommit "$self")/$self
+# this file is generated via https://github.com/roshkhatri/valkey-container/blob/$(fileCommit "$self")/$self
 
-Maintainers: Tianon Gravi <admwiggin@gmail.com> (@tianon),
-             Joseph Ferguson <yosifkit@gmail.com> (@yosifkit)
-GitRepo: https://github.com/docker-library/redis.git
+Maintainers: Roshan Khatri <rvkhatri@amazon.com> (@roshkhatri)
+GitRepo: https://github.com/roshkhatri/valkey-container.git
 EOH
 
 # prints "$2$1$3$1...$N"
