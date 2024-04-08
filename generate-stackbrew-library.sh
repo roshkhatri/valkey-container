@@ -10,8 +10,6 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 if [ "$#" -eq 0 ]; then
 	versions="$(jq -r 'keys | map(@sh) | join(" ")' versions.json)"
-	unstable="$(jq -r 'keys | map(@sh) | join(" ")' unstable.json)"
-	versions="$versions $unstable"
 	eval "set -- $versions"
 fi
 
@@ -51,7 +49,7 @@ getArches() {
 				}
 			' '{}' + \
 			| sort -u \
-			| xargs bashbrew cat --format '[{{ .RepoName }}:{{ .TagName }}]="{{ join " " .TagEntry.Architectures }}"'
+			| xargs bashbrew cat --format '[valkey:{{ .TagName }}]="{{ join " " .TagEntry.Architectures }}"'
 	) )"
 }
 getArches 'valkey'
@@ -99,6 +97,7 @@ for version; do
 		fi
 
 		parent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
+		echo $parent
 		arches="${parentRepoToArches[$parent]}"
 
 		suite="${parent#*:}" # "bookworm-slim", "bookworm"
