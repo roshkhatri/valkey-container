@@ -71,6 +71,7 @@ RUN set -eux; \
 	grep -F "cd jemalloc && ./configure $extraJemallocConfigureFlags " /usr/src/valkey/deps/Makefile; \
 	\
 	export BUILD_TLS=yes; \
+	export USE_FAST_FLOAT=yes;\
 	make -C /usr/src/valkey -j "$(nproc)" all; \
 	make -C /usr/src/valkey install; \
 	\
